@@ -1,7 +1,9 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import timezone
+from unittest.mock import patch
 
 from .models import Poll, Vote
 
@@ -28,6 +30,13 @@ class PollViewTest(TestCase):
             '/accounts/login/', {'username': 'john', 'password': 'rambo'}
         )
         self.assertRedirects(response, '/')
+
+    def test_authenticated_user_can_open_add_poll(self):
+        user = User.objects.create_user(username='poll_user', password='rambo')
+        self.client.force_login(user)
+        with patch('polls.views.render', return_value=HttpResponse()):
+            response = self.client.get('/polls/add/')
+        self.assertEqual(response.status_code, 200)
 
     def test_register(self):
         response = self.client.post(
