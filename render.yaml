@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: django-poll-app
+    plan: free
+    runtime: python
+    buildCommand: bash build.sh
+    startCommand: gunicorn pollme.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "false"
